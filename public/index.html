@@ -1,1 +1,69 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Answer Key Instant Match</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    Answer Key Instant Match
+    <small>Build your own chapters, upload keys, practice with instant matching</small>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="manage">Manage</button>
+    <button class="tab-btn" data-tab="practice">Practice</button>
+  </div>
+</header>
+
+<!-- ================= MANAGE ================= -->
+<section id="view-manage" class="view active">
+  <div class="manage-grid">
+
+    <div class="panel">
+      <div class="panel-header">Chapters</div>
+      <div class="new-row">
+        <input id="new-chapter-name" type="text" placeholder="New chapter name, e.g. Motion in a Plane" />
+        <button class="btn" id="add-chapter-btn">+ Add</button>
+      </div>
+      <div class="chapter-tree" id="chapter-tree">
+        <div class="empty-state">No chapters yet. Add one above to get started.</div>
+      </div>
+    </div>
+
+    <div class="panel editor-panel" id="editor-panel">
+      <div class="empty-state">Select or create a section on the left to upload its answer key.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section id="view-practice" class="view">
+
+  <div class="practice-setup">
+    <div class="field">
+      <label>Chapter</label>
+      <select id="practice-chapter"><option value="">Select chapter…</option></select>
+    </div>
+    <div class="field">
+      <label>Section</label>
+      <select id="practice-section" disabled><option value="">Select section…</option></select>
+    </div>
+    <div class="field">
+      <label>Your name</label>
+      <input id="practice-name" type="text" placeholder="e.g. Aarav Sharma" />
+    </div>
+    <button class="btn" id="start-practice-btn">Start / Resume</button>
+  </div>
+
+  <div id="practice-body"></div>
+
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
