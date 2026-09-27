@@ -259,8 +259,9 @@ textarea.answer-input {
 
 .q-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 10px 14px;
   padding: 11px 16px;
   border-bottom: 1px solid #eef2f5;
   border-left: 4px solid transparent;
@@ -282,11 +283,12 @@ textarea.answer-input {
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--ink-soft);
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
   border-radius: var(--radius);
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -324,6 +326,22 @@ textarea.answer-input {
   cursor: pointer;
 }
 .marked-chip:hover { background: #d99a1b; color: #fff; }
+
+.marked-group {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.marked-group-title {
+  font-family: 'Source Serif 4', serif;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+.marked-group-title .sep { color: var(--ink-soft); font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; margin: 0 6px; }
+.marked-chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .q-bubble {
   font-family: 'IBM Plex Mono', monospace;

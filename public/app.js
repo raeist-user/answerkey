@@ -42,6 +42,7 @@ document.querySelectorAll('.tab-btn').forEach((btn) => {
     document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'marked') loadMarkedOverview();
   });
 });
 
@@ -509,6 +510,69 @@ async function saveAttempt() {
       setTimeout(() => { if (saveBtn) saveBtn.textContent = original; }, 1500);
     }
   }
+}
+
+// ================================================================
+// MARKED OVERVIEW
+// ================================================================
+async function loadMarkedOverview() {
+  const holder = document.getElementById('marked-overview');
+  holder.innerHTML = '';
+  holder.append(el('div', { class: 'empty-state' }, 'Loading…'));
+
+  try {
+    const groups = await api('/marked');
+    holder.innerHTML = '';
+
+    if (groups.length === 0) {
+      holder.append(
+        el('div', { class: 'empty-state' }, 'Nothing marked yet. While practicing, tap ☆ next to a question to flag it for review — it will show up here.')
+      );
+      return;
+    }
+
+    for (const g of groups) {
+      const box = el('div', { class: 'marked-group' });
+      box.append(
+        el('div', { class: 'marked-group-title' }, [g.chapterName, el('span', { class: 'sep' }, '/'), g.sectionName])
+      );
+      const chipRow = el('div', { class: 'marked-chip-row' });
+      for (const q of g.questions) {
+        chipRow.append(
+          el(
+            'button',
+            { class: 'marked-chip', title: q.answer ? `Key: ${q.answer}` : '', onclick: () => goToMarkedQuestion(g.chapterId, g.sectionId, q.qNum) },
+            `Q${q.qNum}`
+          )
+        );
+      }
+      box.append(chipRow);
+      holder.append(box);
+    }
+  } catch (err) {
+    holder.innerHTML = '';
+    holder.append(el('div', { class: 'status-msg err' }, 'Could not load marked questions: ' + err.message));
+  }
+}
+
+// Jump from the Marked tab straight into that question inside its section
+async function goToMarkedQuestion(chapterId, sectionId, qNum) {
+  document.querySelector('.tab-btn[data-tab="practice"]').click();
+
+  const chapterSel = document.getElementById('practice-chapter');
+  chapterSel.value = chapterId;
+
+  const sectionSel = document.getElementById('practice-section');
+  sectionSel.innerHTML = '<option value="">Select section…</option>';
+  const sections = state.sectionsByChapter[chapterId] || [];
+  for (const s of sections) {
+    sectionSel.append(el('option', { value: s._id }, `${s.name} (${s.questions.length})`));
+  }
+  sectionSel.disabled = sections.length === 0;
+  sectionSel.value = sectionId;
+
+  await startPractice();
+  setTimeout(() => scrollToQuestion(qNum), 80);
 }
 
 // ---------------- boot ----------------
