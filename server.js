@@ -152,6 +152,33 @@ app.get('/api/sections/:id/attempt', async (req, res) => {
   res.json(attempt || null);
 });
 
+// Every question you've flagged "for review", grouped by chapter/section,
+// for the Marked overview tab.
+app.get('/api/marked', async (req, res) => {
+  const attempts = await Attempt.find({ marked: { $exists: true, $ne: [] } }).populate({
+    path: 'section',
+    populate: { path: 'chapter' },
+  });
+
+  const groups = attempts
+    .filter((a) => a.section && a.section.chapter)
+    .map((a) => ({
+      chapterId: a.section.chapter._id,
+      chapterName: a.section.chapter.name,
+      sectionId: a.section._id,
+      sectionName: a.section.name,
+      questions: [...a.marked]
+        .sort((x, y) => x - y)
+        .map((qNum) => {
+          const q = a.section.questions.find((q) => q.qNum === qNum);
+          return { qNum, answer: q ? q.answer : null };
+        }),
+    }))
+    .filter((g) => g.questions.length > 0);
+
+  res.json(groups);
+});
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // Fallback to the SPA for any non-API route
