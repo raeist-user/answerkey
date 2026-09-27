@@ -31,12 +31,12 @@ const sectionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// One practice run by one named student against one section
+// Your saved progress on one section (single-user: one attempt per section)
 const attemptSchema = new mongoose.Schema(
   {
-    section: { type: mongoose.Schema.Types.ObjectId, ref: 'Section', required: true, index: true },
-    studentName: { type: String, required: true, trim: true, index: true },
+    section: { type: mongoose.Schema.Types.ObjectId, ref: 'Section', required: true, unique: true, index: true },
     answers: { type: Map, of: String, default: {} }, // qNum(string) -> chosen letter / 'right' / 'wrong'
+    marked: { type: [Number], default: [] }, // question numbers flagged "for review"
     score: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
   },

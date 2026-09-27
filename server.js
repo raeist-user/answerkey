@@ -109,13 +109,11 @@ app.post('/api/sections/:id/upload', async (req, res) => {
 });
 
 // ---------- Attempts ----------
-// Save/update a student's run through a section. studentName + section
-// together identify one ongoing attempt, so re-submitting resumes/overwrites it.
+// This is single-user: there's exactly one saved attempt per section,
+// so saving again just overwrites/resumes that same record.
 app.post('/api/sections/:id/attempts', async (req, res) => {
-  const { studentName, answers } = req.body;
-  if (!studentName || !studentName.trim()) {
-    return res.status(400).json({ error: 'Name is required' });
-  }
+  const { answers, marked } = req.body;
+  const markedList = Array.isArray(marked) ? marked.map(Number).filter((n) => !Number.isNaN(n)) : [];
 
   const section = await Section.findById(req.params.id);
   if (!section) return res.status(404).json({ error: 'Section not found' });
@@ -140,27 +138,18 @@ app.post('/api/sections/:id/attempts', async (req, res) => {
   }
 
   const attempt = await Attempt.findOneAndUpdate(
-    { section: section._id, studentName: studentName.trim() },
-    { answers: graded, score, total },
+    { section: section._id },
+    { answers: graded, marked: markedList, score, total },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
   res.json(attempt);
 });
 
-// Fetch a student's existing attempt for a section, to resume where they left off
-app.get('/api/sections/:id/attempts/:studentName', async (req, res) => {
-  const attempt = await Attempt.findOne({
-    section: req.params.id,
-    studentName: req.params.studentName.trim(),
-  });
+// Fetch your saved progress for a section, to resume where you left off
+app.get('/api/sections/:id/attempt', async (req, res) => {
+  const attempt = await Attempt.findOne({ section: req.params.id });
   res.json(attempt || null);
-});
-
-// Leaderboard-style list of everyone who has attempted a section
-app.get('/api/sections/:id/attempts', async (req, res) => {
-  const attempts = await Attempt.find({ section: req.params.id }).sort({ updatedAt: -1 });
-  res.json(attempts);
 });
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
